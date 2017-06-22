@@ -1,0 +1,49 @@
+# This file is part of the SIS Digitizer Driver.
+# It is subject to the license terms in the LICENSE.txt file found in the
+# top-level directory of this distribution and at
+# https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. No part
+# of the SIS Digitizer Driver, including this file, may be copied,
+# modified, propagated, or distributed except according to the terms
+# contained in the LICENSE.txt file.
+
+# Macros:
+#   PREFIX  - prefix of records (: is implied)
+#   MPREFIX - PREFIX of main port (as in TRSIS.db)
+#   PORT    - port name of the TRSIS instance
+#   CHANNEL - channel number
+#   VOLT_EOFF - default EOFF for voltage offset to DAC conversion
+#   VOLT_ESLO - default ESLO for voltage offset to DAC conversion
+#   ENBLD   - whether the channel is enabled by default (default enabled)
+
+# DAC-based voltage offset
+record(ao, "$(PREFIX):dacVoltageOffset") {
+    field(PINI, "YES")
+    field(VAL,  "$(DEFAULT_DAC_VOLTAGE_OFFSET=0)")
+    field(EGU,  "V")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),0,0)CHANNEL_$(CHANNEL)_DAC")
+    field(LINR, "SLOPE")
+    field(EOFF, "$(VOLT_EOFF)")
+    field(ESLO, "$(VOLT_ESLO)")
+    field(AOFF, "0")
+    field(ASLO, "-1.52587890625e-05") # -1/65536
+}
+
+# Actual channel value
+# Note: to update process $(PREFIX):updateActualValues not this record.
+record(ai, "$(PREFIX):actualRawValue") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),0,0)CHANNEL_$(CHANNEL)_ACTUAL_VALUE")
+    # Alias used from TRSIS.db to process these records.
+    alias("$(MPREFIX):_actualRawValueCh$(CHANNEL)")
+}
+
+# Channel enabled (data is read and processed)
+record(bo, "$(PREFIX):enabled") {
+    field(PINI, "YES")
+    field(VAL,  "$(ENBLD=1)")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),0,0)CHANNEL_$(CHANNEL)_ENABLED")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+}

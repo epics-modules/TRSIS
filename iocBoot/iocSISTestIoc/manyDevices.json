@@ -1,0 +1,10 @@
+[
+    {"name": "SIS3302:D0", "prefix": "SIS:D0", "vme_addr": "0x20000000", "vme_int_vec": "125", "vme_int_lev": "1", "channels": [0, 1, 2, 3, 4, 5, 6, 7]},
+    {"name": "SIS3302:D1", "prefix": "SIS:D1", "vme_addr": "0x30000000", "vme_int_vec": "126", "vme_int_lev": "1", "channels": [0, 1, 2, 3, 4, 5, 6, 7]},
+    {"name": "SIS3302:D2", "prefix": "SIS:D2", "vme_addr": "0x40000000", "vme_int_vec": "127", "vme_int_lev": "1", "channels": [0, 1, 2, 3, 4, 5, 6, 7]},
+    {"name": "SIS3302:D3", "prefix": "SIS:D3", "vme_addr": "0x50000000", "vme_int_vec": "128", "vme_int_lev": "1", "channels": [0, 1, 2, 3, 4, 5, 6, 7]},
+    {"name": "SIS3302:D4", "prefix": "SIS:D4", "vme_addr": "0x60000000", "vme_int_vec": "129", "vme_int_lev": "1", "channels": [0, 1, 2, 3, 4, 5, 6, 7]},
+    {"name": "SIS3302:D5", "prefix": "SIS:D5", "vme_addr": "0x70000000", "vme_int_vec": "130", "vme_int_lev": "1", "channels": [0, 1, 2, 3, 4, 5, 6, 7]},
+    {"name": "SIS3302:D6", "prefix": "SIS:D6", "vme_addr": "0x80000000", "vme_int_vec": "131", "vme_int_lev": "1", "channels": [0, 1, 2, 3, 4, 5, 6, 7]}
+]
+

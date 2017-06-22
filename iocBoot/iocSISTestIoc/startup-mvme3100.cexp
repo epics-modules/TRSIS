@@ -1,0 +1,11 @@
+
+# Load the IOC binary.
+ld("../../bin/RTEMS-mvme3100/SISTestIoc.obj")
+
+# Startup the debugger support.
+#ld("rtems-gdb-stub.obj")
+#rtems_gdb_start(200,0)
+#lsmod()
+
+# Execute the st.cmd using the IOC shell.
+iocsh("st.cmd")

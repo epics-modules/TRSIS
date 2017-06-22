@@ -1,0 +1,441 @@
+# This file is part of the SIS Digitizer Driver.
+# It is subject to the license terms in the LICENSE.txt file found in the
+# top-level directory of this distribution and at
+# https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. No part
+# of the SIS Digitizer Driver, including this file, may be copied,
+# modified, propagated, or distributed except according to the terms
+# contained in the LICENSE.txt file.
+
+# Macros:
+#   PREFIX  - prefix of records (: is implied)
+#   PORT    - port name of the TRSIS instance
+#   STATES_SCAN - SCAN rate for refreshing device states
+#   ACTUAL_SCAN - SCAN rate for refreshing actual channel values
+#   TIME_EGU - EGU field of lastRelTime, default is "s"
+
+
+# TR CONFIGURUATION PARAMETERS
+
+# Triggering mode
+record(mbbo, "$(PREFIX):trigger") {
+    field(PINI, "YES")
+    field(VAL,  "$(DEFAULT_TRIGGER=1)")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),0,0)DESIRED_TRIGGERING_MODE")
+    field(ZRVL, "0")
+    field(ZRST, "soft")
+    field(ONVL, "1")
+    field(ONST, "autstart/FPstop")
+    field(TWVL, "2")
+    field(TWST, "FPstart/FPstop")
+    field(THVL, "3")
+    field(THST, "FPstart/autstop")
+}
+record(mbbi, "$(PREFIX):get_trigger") {
+    field(SCAN, "I/O Intr")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),0,0)EFFECTIVE_TRIGGERING_MODE")
+    field(ZRVL, "0")
+    field(ZRST, "soft")
+    field(ONVL, "1")
+    field(ONST, "autstart/FPstop")
+    field(TWVL, "2")
+    field(TWST, "FPstart/FPstop")
+    field(THVL, "3")
+    field(THST, "FPstart/autstop")
+    field(FRVL, "-1")
+    field(FRST, "N/A")
+}
+
+# Averaged samples
+record(mbbo, "$(PREFIX):preAverage") {
+    field(PINI, "YES")
+    field(VAL,  "$(DEFAULT_PREAVERAGE=0)")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),0,0)DESIRED_AVERAGED_SAMPLES_LOG")
+    field(ZRVL, "0")
+    field(ZRST, "1")
+    field(ONVL, "1")
+    field(ONST, "2")
+    field(TWVL, "2")
+    field(TWST, "4")
+    field(THVL, "3")
+    field(THST, "8")
+    field(FRVL, "4")
+    field(FRST, "16")
+    field(FVVL, "5")
+    field(FVST, "32")
+    field(SXVL, "6")
+    field(SXST, "64")
+    field(SVVL, "7")
+    field(SVST, "128")
+}
+record(mbbi, "$(PREFIX):get_preAverage") {
+    field(SCAN, "I/O Intr")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),0,0)EFFECTIVE_AVERAGED_SAMPLES_LOG")
+    field(ZRVL, "0")
+    field(ZRST, "1")
+    field(ONVL, "1")
+    field(ONST, "2")
+    field(TWVL, "2")
+    field(TWST, "4")
+    field(THVL, "3")
+    field(THST, "8")
+    field(FRVL, "4")
+    field(FRST, "16")
+    field(FVVL, "5")
+    field(FVST, "32")
+    field(SXVL, "6")
+    field(SXST, "64")
+    field(SVVL, "7")
+    field(SVST, "128")
+    field(EIVL, "-1")
+    field(EIST, "N/A")
+}
+
+# Clock source
+record(mbbo, "$(PREFIX):clock") {
+    field(PINI, "YES")
+    field(VAL,  "$(DEFAULT_CLOCK=0)")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),0,0)DESIRED_CLOCK_SOURCE")
+    field(ZRVL, "0")
+    field(ZRST, "100 MHz")
+    field(ONVL, "1")
+    field(ONST, "50 MHz")
+    field(TWVL, "2")
+    field(TWST, "25 MHz")
+    field(THVL, "3")
+    field(THST, "10 MHz")
+    field(FRVL, "4")
+    field(FRST, "1 MHz")
+    field(FVVL, "5")
+    field(FVST, "Ext Random")
+    field(SXVL, "6")
+    field(SXST, "Ext Symm")
+    field(SVVL, "7")
+    field(SVST, "2nd 100 MHz")
+}
+record(mbbi, "$(PREFIX):get_clock") {
+    field(SCAN, "I/O Intr")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),0,0)EFFECTIVE_CLOCK_SOURCE")
+    field(ZRVL, "0")
+    field(ZRST, "100 MHz")
+    field(ONVL, "1")
+    field(ONST, "50 MHz")
+    field(TWVL, "2")
+    field(TWST, "25 MHz")
+    field(THVL, "3")
+    field(THST, "10 MHz")
+    field(FRVL, "4")
+    field(FRST, "1 MHz")
+    field(FVVL, "5")
+    field(FVST, "Ext Random")
+    field(SXVL, "6")
+    field(SXST, "Ext Symm")
+    field(SVVL, "7")
+    field(SVST, "2nd 100 MHz")
+    field(EIVL, "-1")
+    field(EIST, "N/A")
+}
+
+# External clock rate
+record(ao, "$(PREFIX):extRate") {
+    field(PINI, "YES")
+    field(VAL,  "$(DEFAULT_EXTRATE=100e6)")
+    field(EGU,  "Hz")
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT),0,0)DESIRED_EXTERNAL_CLOCK_RATE")
+}
+record(ai, "$(PREFIX):get_extRate") {
+    field(SCAN, "I/O Intr")
+    field(EGU,  "Hz")
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),0,0)EFFECTIVE_EXTERNAL_CLOCK_RATE")
+}
+
+# Events per event group
+record(longout, "$(PREFIX):numberPTE") {
+    field(PINI, "YES")
+    field(VAL,  "$(DEFAULT_NUM_PTE=1)")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),0,0)DESIRED_EVENTS_PER_GROUP")
+}
+record(ai, "$(PREFIX):get_numberPTE") {
+    field(SCAN, "I/O Intr")
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),0,0)EFFECTIVE_EVENTS_PER_GROUP")
+}
+
+# Events buffer size
+record(longout, "$(PREFIX):eventsBufferSize") {
+    field(PINI, "YES")
+    field(VAL,  "$(DEFAULT_EVENTS_BUF_SIZE=1024)")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),0,0)DESIRED_EVENTS_BUFFER_SIZE")
+}
+record(ai, "$(PREFIX):get_eventsBufferSize") {
+    field(SCAN, "I/O Intr")
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),0,0)EFFECTIVE_EVENTS_BUFFER_SIZE")
+}
+
+# Test data mode
+record(mbbo, "$(PREFIX):testDataMode") {
+    field(PINI, "YES")
+    field(VAL,  "$(DEFAULT_TEST_DATA_MODE=0)")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),0,0)DESIRED_TEST_DATA_MODE")
+    field(ZRVL, "0")
+    field(ZRST, "Disabled")
+    field(ONVL, "1")
+    field(ONST, "16 bit")
+    field(TWVL, "2")
+    field(TWST, "32 bit")
+}
+record(mbbi, "$(PREFIX):get_testDataMode") {
+    field(SCAN, "I/O Intr")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),0,0)EFFECTIVE_TEST_DATA_MODE")
+    field(ZRVL, "0")
+    field(ZRST, "Disabled")
+    field(ONVL, "1")
+    field(ONST, "16 bit")
+    field(TWVL, "2")
+    field(TWST, "32 bit")
+    field(THVL, "-1")
+    field(THST, "N/A")
+}
+
+# Test data start
+record(longout, "$(PREFIX):testDataStart") {
+    field(PINI, "YES")
+    field(VAL,  "1")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),0,0)DESIRED_TEST_DATA_START")
+    field(LOPR, "0")
+    field(HOPR, "65535")
+}
+record(ai, "$(PREFIX):get_testDataStart") {
+    field(SCAN, "I/O Intr")
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),0,0)EFFECTIVE_TEST_DATA_START")
+    field(LOPR, "0")
+    field(HOPR, "65535")
+}
+
+
+# ACTIONS
+
+# Send software trigger
+record(bo, "$(PREFIX):softTrigger") {
+    field(DTYP, "asynInt32")
+    field(OMSL, "closed_loop")
+    field(DOL,  "1")
+    field(OUT,  "@asyn($(PORT),0,0)SEND_SW_TRIGGER")
+    field(ONAM, "softTrigger")
+}
+
+# Update actual channel values
+record(bo, "$(PREFIX):updateActualValues") {
+    field(DTYP, "asynInt32")
+    field(OMSL, "closed_loop")
+    field(DOL,  "1")
+    field(OUT,  "@asyn($(PORT),0,0)UPDATE_ACTUAL_VALUES")
+    field(ONAM, "Update")
+    field(FLNK, "$(PREFIX):_updateActualValuePvs")
+}
+# and update the PVs from the new values in asyn parameters.
+record(calc, "$(PREFIX):_updateActualValuePvs") {
+    field(INPA, "$(PREFIX):_actualRawValueCh0 PP")
+    field(INPB, "$(PREFIX):_actualRawValueCh1 PP")
+    field(INPC, "$(PREFIX):_actualRawValueCh2 PP")
+    field(INPD, "$(PREFIX):_actualRawValueCh3 PP")
+    field(INPE, "$(PREFIX):_actualRawValueCh4 PP")
+    field(INPF, "$(PREFIX):_actualRawValueCh5 PP")
+    field(INPG, "$(PREFIX):_actualRawValueCh6 PP")
+    field(INPH, "$(PREFIX):_actualRawValueCh7 PP")
+    field(CALC, "0")
+}
+
+# Update actual values periorically.
+record(bo, "$(PREFIX):_autoUpdateActualValues") {
+    field(SCAN, "$(ACTUAL_SCAN)")
+    field(FLNK, "$(PREFIX):updateActualValues")
+}
+
+# Update states upon request
+record(bo, "$(PREFIX):updateStates") {
+    field(ONAM, "Update")
+    field(FLNK, "$(PREFIX):_updateStates")
+}
+
+# Reset digitizer
+record(bo, "$(PREFIX):reset") {
+    field(DTYP, "asynInt32")
+    field(OMSL, "closed_loop")
+    field(DOL,  "1")
+    field(OUT,  "@asyn($(PORT),0,0)GENERAL_RESET")
+    field(ONAM, "Reset")
+}
+
+# Clear HW timestamp counter
+record(bo, "$(PREFIX):clearTimestamp") {
+    field(DTYP, "asynInt32")
+    field(OMSL, "closed_loop")
+    field(DOL,  "1")
+    field(OUT,  "@asyn($(PORT),0,0)CLEAR_TIMESTAMP")
+    field(ONAM, "Clear")
+}
+
+
+# READ-ONLY STATIC INFORMATION
+
+# Firmware major revision
+record(longin, "$(PREFIX):firmwareMajorRev") {
+    field(SCAN, "I/O Intr")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),0,0)FIRMWARE_MAJOR_REVISION")
+}
+
+# Firmware minor revision
+record(longin, "$(PREFIX):firmwareMinorRev") {
+    field(SCAN, "I/O Intr")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),0,0)FIRMWARE_MINOR_REVISION")
+}
+
+# READ-ONLY DYNAMIC INFORMATION
+
+# Actual number of events
+record(longin, "$(PREFIX):actualEvents") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),0,0)ACTUAL_EVENTS")
+}
+
+# Clock source readback
+record(mbbi, "$(PREFIX):clockRb") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),0,0)CLOCK_SOURCE_READBACK")
+    field(ZRVL, "0")
+    field(ZRST, "100 MHz")
+    field(ONVL, "1")
+    field(ONST, "50 MHz")
+    field(TWVL, "2")
+    field(TWST, "25 MHz")
+    field(THVL, "3")
+    field(THST, "10 MHz")
+    field(FRVL, "4")
+    field(FRST, "1 MHz")
+    field(FVVL, "5")
+    field(FVST, "Ext Random")
+    field(SXVL, "6")
+    field(SXST, "Ext Symm")
+    field(SVVL, "7")
+    field(SVST, "2nd 100 MHz")
+}
+
+# Sampling busy status
+record(bi, "$(PREFIX):samplingBusy") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),0,0)SAMPLING_BUSY")
+    field(ZNAM, "No")
+    field(ONAM, "Yes")
+}
+
+# Sampling logic armed status
+record(bi, "$(PREFIX):samplingLogicArmed") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),0,0)SAMPLING_LOGIC_ARMED")
+    field(ZNAM, "No")
+    field(ONAM, "Yes")
+}
+
+# Stop delay readback
+record(longin, "$(PREFIX):stopDelayRb") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),0,0)STOP_DELAY_READBACK")
+}
+
+# Next sample address ADC1
+record(longin, "$(PREFIX):nextSampleAddressCh0") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),0,0)NEXT_SAMPLE_ADDRESS_CH0")
+}
+
+# Refresh states periodically
+record(bo, "$(PREFIX):_autoRefreshStates") {
+    field(SCAN, "$(STATES_SCAN)")
+    field(FLNK, "$(PREFIX):_updateStates")
+}
+
+# This refreshes the states when processed
+record(calc, "$(PREFIX):_updateStates") {
+    # First make the driver read the states from the device.
+    field(INPA, "$(PREFIX):_driverUpdateStates PP")
+    # Then read out the cached parameter values.
+    field(INPB, "$(PREFIX):actualEvents PP")
+    field(INPC, "$(PREFIX):clockRb PP")
+    field(INPD, "$(PREFIX):samplingBusy PP")
+    field(INPE, "$(PREFIX):samplingLogicArmed PP")
+    field(INPF, "$(PREFIX):stopDelayRb PP")
+    field(INPG, "$(PREFIX):nextSampleAddressCh0 PP")
+}
+record(bo, "$(PREFIX):_driverUpdateStates") {
+    field(DTYP, "asynInt32")
+    field(OMSL, "closed_loop")
+    field(DOL,  "1")
+    field(OUT,  "@asyn($(PORT),0,0)UPDATE_STATES")
+}
+
+# Period of the hardware timestamp counter
+record(ai, "$(PREFIX):hwTimePeriod") {
+    field(SCAN, "I/O Intr")
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),0,0)EFFECTIVE_TIMESTAMP_PERIOD")
+    field(EGU,  "s")
+}
+
+# Last absolute hardware timestamp (unit is raw sample clock)
+record(ai, "$(PREFIX):lastHwTime") {
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),0,0)LAST_HW_TIME")
+    field(EGU,  "sample clocks")
+}
+
+# Last relative time from previous burst or arming time
+# based on hardware timestamp difference (converted to natural units)
+record(ai, "$(PREFIX):lastRelTime") {
+    field(EGU,  "$(TIME_EGU=s)")
+}
+
+# This reads the raw lastRelTime value in seconds from the driver
+# and writes a converted value in desired units to lastRelTime.
+record(calcout, "$(PREFIX):_updateLastRelTime") {
+    field(INPA, "$(PREFIX):_lastRelTimeSec PP")
+    field(INPB, "$(PREFIX):TIME_UNIT_INV")
+    field(CALC, "A*B")
+    field(OUT,  "$(PREFIX):lastRelTime PP")
+}
+record(ai, "$(PREFIX):_lastRelTimeSec") {
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),0,0)LAST_REL_TIME")
+    field(EGU,  "s")
+}
+
+# This is processed from TRBase.db after information for a new
+# burst is available, we use it to update the times.
+record(fanout, "$(PREFIX):_on_new_burst") {
+    field(SELM, "All")
+    field(LNK1, "$(PREFIX):lastHwTime")
+    field(LNK2, "$(PREFIX):_updateLastRelTime")
+}
+
+# How many times during the current acquisition rearming had to be delayed
+record(longin, "$(PREFIX):delayedArmsCount") {
+    field(SCAN, "I/O Intr")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),0,0)DELAYED_REARMS_COUNT")
+}

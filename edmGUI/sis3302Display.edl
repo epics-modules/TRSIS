@@ -1,0 +1,2953 @@
+4 0 1
+beginScreenProperties
+major 4
+minor 0
+release 1
+x 539
+y 70
+w 1100
+h 855
+font "utopia-bold-r-12.0"
+ctlFont "utopia-bold-r-12.0"
+btnFont "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 16
+textColor index 6
+ctlFgColor1 index 4
+ctlFgColor2 index 3
+ctlBgColor1 index 3
+ctlBgColor2 index 0
+topShadowColor index 2
+botShadowColor index 15
+title "SIS3302"
+showGrid
+snapToGrid
+gridSize 20
+pvType "EPICS"
+endScreenProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 20
+y 20
+w 440
+h 240
+lineColor index 6
+fillColor index 3
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 480
+y 20
+w 300
+h 120
+lineColor index 6
+fillColor index 3
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 800
+y 20
+w 280
+h 240
+lineColor index 6
+fillColor index 3
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 20
+y 280
+w 440
+h 240
+lineColor index 6
+fillColor index 3
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 480
+y 280
+w 300
+h 240
+lineColor index 6
+fillColor index 3
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 800
+y 280
+w 280
+h 240
+lineColor index 6
+fillColor index 3
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 120
+y 40
+w 40
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+visPv "$(PORT):Arm"
+visMin "3"
+visMax "4"
+value {
+  "Busy"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 120
+y 40
+w 60
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+visPv "$(PORT):Arm"
+visMin "4"
+visMax "5"
+value {
+  "Error"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 60
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Test Data Mode"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 0
+w 200
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Struck SIS3302 Digitizer"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 340
+y 40
+w 40
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Clock"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 200
+y 40
+w 80
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Trigger Type"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 40
+w 60
+h 20
+font "utopia-bold-r-12.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Set Arm"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 100
+w 106
+h 15
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Pre-Post Samples"
+}
+autoSize
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 200
+y 100
+w 100
+h 20
+controlPv "$(PORT):NumberPPS"
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 3
+useKp
+fastUpdate
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 480
+y 20
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Input Settings"
+}
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 680
+y 100
+w 80
+h 20
+controlPv "$(PORT):eventsBufferSize"
+format "decimal"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 4
+useKp
+useAlarmBorder
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 280
+w 93
+h 15
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Armed Settings"
+}
+autoSize
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 200
+y 120
+w 100
+h 20
+controlPv "$(PORT):NumberPTS"
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 3
+useKp
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 120
+w 130
+h 15
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Post-Trigger Samples"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 320
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Last Burst ID"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 340
+y 320
+w 100
+h 20
+controlPv "$(PORT):GET_BURST_ID"
+format "decimal"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 4
+fastUpdate
+useAlarmBorder
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 300
+w 120
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Bursts per Second"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 340
+y 300
+w 100
+h 20
+controlPv "$(PORT):Rate"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 3
+fastUpdate
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 180
+w 120
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Maximum Bursts"
+}
+endObjectProperties
+
+# (Menu Button)
+object activeMenuButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 340
+y 60
+w 100
+h 20
+fgColor index 6
+bgColor index 3
+inconsistentColor index 0
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):Clock"
+indicatorPv "$(PORT):Clock"
+font "utopia-bold-r-12.0"
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 340
+y 340
+w 100
+h 20
+controlPv "$(PORT):InterruptProcessingTime"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 3
+fastUpdate
+showUnits
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 340
+y 360
+w 100
+h 20
+controlPv "$(PORT):MainProcessingTime"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+nullColor index 3
+fastUpdate
+showUnits
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 340
+w 220
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Burst Processing Time in ISR"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 360
+w 240
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Main Burst Processing Time"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 400
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Maximum Bursts"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 660
+y 400
+w 100
+h 20
+controlPv "$(PORT):GET_ARMED_NUM_BURSTS"
+format "decimal"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 4
+fastUpdate
+useAlarmBorder
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 40
+w 120
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Averaged Samples"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 820
+y 60
+w 100
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Channel 0"
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 500
+y 280
+w 0
+h 0
+lineColor index 6
+fillColor index 3
+numPoints 1
+xPoints {
+  0 500
+}
+yPoints {
+  0 280
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 500
+y 300
+w 100
+h 0
+lineColor index 6
+fillColor index 3
+numPoints 2
+xPoints {
+  0 500
+  1 600
+}
+yPoints {
+  0 300
+  1 300
+}
+endObjectProperties
+
+# (X-Y Graph)
+object xyGraphClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+# Geometry
+x 280
+y 560
+w 580
+h 280
+# Appearance
+border
+autoScaleBothDirections
+autoScaleUpdateMs 10
+autoScaleThreshPct 10
+graphTitle "$(PORT):CH$(N)$(DATA)"
+xLabel "Time [us]"
+yLabel "Voltage Bin"
+fgColor index 6
+bgColor index 0
+gridColor index 6
+font "utopia-bold-r-12.0"
+# Operating Modes
+nPts 2
+# X axis properties
+showXAxis
+xAxisStyle "time"
+xAxisSrc "AutoScale"
+xMax 1
+# Y axis properties
+showYAxis
+yAxisSrc "AutoScale"
+yMin 0
+yMax 65536
+yAxisPrecision 15
+# Y2 axis properties
+y2AxisSrc "AutoScale"
+y2Max 1
+# Trace Properties
+numTraces 1
+xPv {
+  0 "$(PORT):Time"
+}
+yPv {
+  0 "$(PORT):CH$(N)$(DATA)"
+}
+nPv {
+  0 "$(PORT):Time.NORD"
+}
+opMode {
+  0 "plot"
+}
+plotColor {
+  0 index 9
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 160
+w 160
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "External Sample Rate"
+}
+endObjectProperties
+
+# (Menu Button)
+object activeMenuButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 680
+y 40
+w 80
+h 20
+fgColor index 6
+bgColor index 3
+inconsistentColor index 0
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):preAverage"
+font "utopia-bold-r-10.0"
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 1460
+y 0
+w 0
+h 0
+lineColor index 6
+fillColor index 3
+numPoints 1
+xPoints {
+  0 1462
+}
+yPoints {
+  0 7
+}
+endObjectProperties
+
+# (Menu Mux)
+object menuMuxClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 400
+y 540
+w 120
+h 20
+fgColor index 2
+bgColor index 1
+topShadowColor index 2
+botShadowColor index 15
+font "utopia-bold-r-12.0"
+numItems 8
+symbolTag {
+  0 "Channel 0"
+  1 "Channel 1"
+  2 "Channel 2"
+  3 "Channel 3"
+  4 "Channel 4"
+  5 "Channel 5"
+  6 "Channel 6"
+  7 "Channel 7"
+}
+symbol0 {
+  0 "N"
+  1 "N"
+  2 "N"
+  3 "N"
+  4 "N"
+  5 "N"
+  6 "N"
+  7 "N"
+}
+value0 {
+  0 "0"
+  1 "1"
+  2 "2"
+  3 "3"
+  4 "4"
+  5 "5"
+  6 "6"
+  7 "7"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 340
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Pre-Post Samples"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 660
+y 360
+w 100
+h 20
+controlPv "$(PORT):get_numberPTS"
+format "decimal"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 4
+fastUpdate
+useAlarmBorder
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 280
+w 129
+h 15
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Bursting Information"
+}
+autoSize
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 40
+y 300
+w 140
+h 0
+lineColor index 6
+fillColor index 3
+numPoints 2
+xPoints {
+  0 40
+  1 180
+}
+yPoints {
+  0 300
+  1 300
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 820
+y 20
+w 103
+h 15
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Channel Settings"
+}
+autoSize
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 820
+y 40
+w 120
+h 0
+lineColor index 6
+fillColor index 3
+numPoints 2
+xPoints {
+  0 820
+  1 940
+}
+yPoints {
+  0 40
+  1 40
+}
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 160
+y 220
+w 140
+h 20
+fgColor index 2
+onColor index 14
+offColor index 14
+inconsistentColor index 14
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):SoftTrigger"
+onLabel "Send Software Trigger"
+offLabel "Send Software Trigger"
+labelType "literal"
+3d
+font "utopia-bold-r-12.0"
+objType "controls"
+controlBitPos 0
+endObjectProperties
+
+# (Menu Mux)
+object menuMuxClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 740
+y 540
+w 120
+h 20
+fgColor index 2
+bgColor index 1
+topShadowColor index 2
+botShadowColor index 15
+font "utopia-bold-r-12.0"
+numItems 2
+symbolTag {
+  0 "Fast Update"
+  1 "Slow Update"
+}
+symbol0 {
+  0 "DATA"
+  1 "DATA"
+}
+value0 {
+  0 "Waveform"
+  1 "WaveformSlow"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 620
+y 540
+w 120
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Data display mode: "
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 320
+y 100
+w 140
+h 140
+font "utopia-bold-r-11.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "If using external clock,"
+  "set Custom Sample Rate"
+  "to the expected rate."
+  "This will be used for"
+  "autocalibration to"
+  "achieve best accuracy"
+  "and for the time axis."
+  ""
+  "For unlimited bursts,"
+  "set Maximum Bursts to 0."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 820
+y 300
+w 160
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Firmware Major Revision"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 1000
+y 300
+w 60
+h 20
+controlPv "$(PORT):firmwareMajorRev"
+format "hex"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 4
+useHexPrefix
+useAlarmBorder
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 820
+y 280
+w 117
+h 15
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Device Information"
+}
+autoSize
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 820
+y 300
+w 120
+h 0
+lineColor index 6
+fillColor index 3
+numPoints 2
+xPoints {
+  0 820
+  1 940
+}
+yPoints {
+  0 300
+  1 300
+}
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 200
+y 160
+w 100
+h 20
+controlPv "$(PORT):extRate"
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 3
+useKp
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 140
+w 106
+h 15
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Events per Group"
+}
+autoSize
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 200
+y 140
+w 100
+h 20
+controlPv "$(PORT):NumberPTE"
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 3
+useKp
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 100
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Events Buffer Size"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 80
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Test Data Start"
+}
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 680
+y 80
+w 80
+h 20
+controlPv "$(PORT):testDataStart"
+format "decimal"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 4
+useKp
+useAlarmBorder
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 300
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Trigger"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 660
+y 300
+w 100
+h 20
+controlPv "$(PORT):get_trigger"
+format "decimal"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 4
+fastUpdate
+useAlarmBorder
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 320
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Display Sample Rate"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 660
+y 320
+w 100
+h 20
+controlPv "$(PORT):GET_DISPLAY_SAMPLE_RATE"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+precision 0
+nullColor index 3
+smartRefresh
+fastUpdate
+showUnits
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 360
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Post-Trigger Samples"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 380
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Events per Group"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 660
+y 340
+w 100
+h 20
+controlPv "$(PORT):get_numberPPS"
+format "decimal"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 4
+fastUpdate
+useAlarmBorder
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 660
+y 380
+w 100
+h 20
+controlPv "$(PORT):get_numberPTE"
+format "decimal"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 4
+fastUpdate
+useAlarmBorder
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 820
+y 80
+w 100
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Channel 1"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 820
+y 100
+w 100
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Channel 2"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 820
+y 120
+w 100
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Channel 3"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 820
+y 140
+w 100
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Channel 4"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 820
+y 160
+w 100
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Channel 5"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 820
+y 180
+w 100
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Channel 6"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 820
+y 200
+w 100
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Channel 7"
+}
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 980
+y 60
+w 80
+h 20
+controlPv "$(PORT):CH0:dacVoltageOffset"
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 3
+useKp
+fastUpdate
+useHexPrefix
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 820
+y 320
+w 160
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Firmware Minor Revision"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 1000
+y 320
+w 60
+h 20
+controlPv "$(PORT):firmwareMinorRev"
+format "hex"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 4
+useHexPrefix
+useAlarmBorder
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 820
+y 340
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Device Name"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 1000
+y 340
+w 60
+h 20
+controlPv "$(PORT):Name"
+format "decimal"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+nullColor index 4
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 200
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Clock Source"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 200
+y 200
+w 100
+h 20
+controlPv "$(PORT):clockRb"
+format "decimal"
+font "utopia-bold-r-12.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 4
+fastUpdate
+useAlarmBorder
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 340
+y 380
+w 100
+h 20
+controlPv "$(PORT):lastHwTime"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 3
+fastUpdate
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 340
+y 400
+w 100
+h 20
+controlPv "$(PORT):lastRelTime"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+nullColor index 3
+fastUpdate
+showUnits
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 380
+w 220
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Last HW Time"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 400
+w 220
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Last Relative HW Time"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 340
+y 420
+w 100
+h 20
+controlPv "$(PORT):samplingBusy"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 3
+fastUpdate
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 340
+y 440
+w 100
+h 20
+controlPv "$(PORT):samplingLogicArmed"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+nullColor index 3
+fastUpdate
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 420
+w 220
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Sampling Busy"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 440
+w 220
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Sampling Logic Armed"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 480
+w 220
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Next Sample Address"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 340
+y 480
+w 100
+h 20
+controlPv "$(PORT):nextSampleAddressCh0"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+nullColor index 3
+fastUpdate
+showUnits
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Menu Button)
+object activeMenuButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 180
+y 60
+w 140
+h 20
+fgColor index 6
+bgColor index 3
+inconsistentColor index 0
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):Trigger"
+indicatorPv "$(PORT):Trigger"
+font "utopia-bold-r-12.0"
+endObjectProperties
+
+# (Menu Button)
+object activeMenuButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 40
+y 60
+w 120
+h 20
+fgColor index 6
+bgColor index 3
+inconsistentColor index 0
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):SetArm"
+indicatorPv "$(PORT):Arm"
+font "utopia-bold-r-12.0"
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 900
+y 60
+w 60
+h 20
+fgColor index 6
+onColor index 3
+offColor index 3
+inconsistentColor index 0
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):CH0:enabled"
+indicatorPv "$(PORT):CH0:enabled"
+3d
+font "utopia-bold-r-12.0"
+objType "controls"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 900
+y 40
+w 38
+h 15
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Status"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 980
+y 40
+w 84
+h 15
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Voltage Offset"
+}
+autoSize
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 900
+y 80
+w 60
+h 20
+fgColor index 6
+onColor index 3
+offColor index 3
+inconsistentColor index 0
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):CH1:enabled"
+indicatorPv "$(PORT):CH1:enabled"
+3d
+font "utopia-bold-r-12.0"
+objType "controls"
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 900
+y 100
+w 60
+h 20
+fgColor index 6
+onColor index 3
+offColor index 3
+inconsistentColor index 0
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):CH2:enabled"
+indicatorPv "$(PORT):CH2:enabled"
+3d
+font "utopia-bold-r-12.0"
+objType "controls"
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 900
+y 120
+w 60
+h 20
+fgColor index 6
+onColor index 3
+offColor index 3
+inconsistentColor index 0
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):CH3:enabled"
+indicatorPv "$(PORT):CH3:enabled"
+3d
+font "utopia-bold-r-12.0"
+objType "controls"
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 900
+y 140
+w 60
+h 20
+fgColor index 6
+onColor index 3
+offColor index 3
+inconsistentColor index 0
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):CH4:enabled"
+indicatorPv "$(PORT):CH4:enabled"
+3d
+font "utopia-bold-r-12.0"
+objType "controls"
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 900
+y 160
+w 60
+h 20
+fgColor index 6
+onColor index 3
+offColor index 3
+inconsistentColor index 0
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):CH5:enabled"
+indicatorPv "$(PORT):CH5:enabled"
+3d
+font "utopia-bold-r-12.0"
+objType "controls"
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 900
+y 180
+w 60
+h 20
+fgColor index 6
+onColor index 3
+offColor index 3
+inconsistentColor index 0
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):CH6:enabled"
+indicatorPv "$(PORT):CH6:enabled"
+3d
+font "utopia-bold-r-12.0"
+objType "controls"
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 900
+y 200
+w 60
+h 20
+fgColor index 6
+onColor index 3
+offColor index 3
+inconsistentColor index 0
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):CH7:enabled"
+indicatorPv "$(PORT):CH7:enabled"
+3d
+font "utopia-bold-r-12.0"
+objType "controls"
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 980
+y 80
+w 80
+h 20
+controlPv "$(PORT):CH1:dacVoltageOffset"
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 3
+useKp
+fastUpdate
+useHexPrefix
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 980
+y 100
+w 80
+h 20
+controlPv "$(PORT):CH2:dacVoltageOffset"
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 3
+useKp
+fastUpdate
+useHexPrefix
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 980
+y 120
+w 80
+h 20
+controlPv "$(PORT):CH3:dacVoltageOffset"
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 3
+useKp
+fastUpdate
+useHexPrefix
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 980
+y 140
+w 80
+h 20
+controlPv "$(PORT):CH4:dacVoltageOffset"
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 3
+useKp
+fastUpdate
+useHexPrefix
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 980
+y 160
+w 80
+h 20
+controlPv "$(PORT):CH5:dacVoltageOffset"
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 3
+useKp
+fastUpdate
+useHexPrefix
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 980
+y 180
+w 80
+h 20
+controlPv "$(PORT):CH6:dacVoltageOffset"
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 3
+useKp
+fastUpdate
+useHexPrefix
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 980
+y 200
+w 80
+h 20
+controlPv "$(PORT):CH7:dacVoltageOffset"
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 3
+useKp
+fastUpdate
+useHexPrefix
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 500
+y 40
+w 100
+h 0
+lineColor index 6
+fillColor index 3
+numPoints 2
+xPoints {
+  0 500
+  1 600
+}
+yPoints {
+  0 40
+  1 40
+}
+endObjectProperties
+
+# (Menu Button)
+object activeMenuButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 680
+y 60
+w 80
+h 20
+fgColor index 6
+bgColor index 3
+inconsistentColor index 0
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):testDataMode"
+font "utopia-bold-r-10.0"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 440
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Test Mode"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 660
+y 440
+w 100
+h 20
+controlPv "$(PORT):get_testDataMode"
+format "decimal"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 4
+fastUpdate
+useAlarmBorder
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 460
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Test Data Start"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 480
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Events Buffer Size"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 660
+y 460
+w 100
+h 20
+controlPv "$(PORT):get_testDataStart"
+format "decimal"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 4
+fastUpdate
+useAlarmBorder
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 660
+y 480
+w 100
+h 20
+controlPv "$(PORT):get_eventsBufferSize"
+format "decimal"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 4
+fastUpdate
+useAlarmBorder
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 40
+y 40
+w 80
+h 0
+lineColor index 6
+fillColor index 3
+numPoints 2
+xPoints {
+  0 40
+  1 120
+}
+yPoints {
+  0 40
+  1 40
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 20
+w 80
+h 20
+font "utopia-bold-r-12.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Arm Settings"
+}
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 200
+y 180
+w 100
+h 20
+controlPv "$(PORT):NUM_BURSTS"
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 0
+editable
+motifWidget
+limitsFromDb
+nullColor index 3
+useKp
+newPos
+objType "controls"
+characterMode
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 280
+y 540
+w 120
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Data Display Area"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 420
+w 140
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Averaged Samples"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 660
+y 420
+w 100
+h 20
+controlPv "$(PORT):get_preAverage"
+format "decimal"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+limitsFromDb
+nullColor index 4
+fastUpdate
+useAlarmBorder
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 460
+w 220
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Stop Delay"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 340
+y 460
+w 100
+h 20
+controlPv "$(PORT):stopDelayRb"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+nullColor index 3
+fastUpdate
+showUnits
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 500
+w 220
+h 20
+font "utopia-bold-r-12.0"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Delayed Rearms Count"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 340
+y 500
+w 100
+h 20
+controlPv "$(PORT):delayedArmsCount"
+font "utopia-bold-r-10.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 5
+nullColor index 3
+fastUpdate
+showUnits
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 480
+y 160
+w 300
+h 100
+lineColor index 6
+fillColor index 3
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 500
+y 160
+w 100
+h 20
+font "utopia-bold-r-12.0"
+fontAlign "center"
+fgColor index 6
+bgColor index 3
+useDisplayBg
+value {
+  "Device Control"
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 500
+y 180
+w 112
+h 0
+lineColor index 6
+fillColor index 3
+numPoints 2
+xPoints {
+  0 500
+  1 612
+}
+yPoints {
+  0 180
+  1 180
+}
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 560
+y 200
+w 140
+h 20
+fgColor index 2
+onColor index 14
+offColor index 14
+inconsistentColor index 14
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):reset"
+onLabel "Reset Device"
+offLabel "Reset Device"
+labelType "literal"
+3d
+font "utopia-bold-r-12.0"
+objType "controls"
+controlBitPos 0
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 560
+y 220
+w 140
+h 20
+fgColor index 2
+onColor index 14
+offColor index 14
+inconsistentColor index 14
+topShadowColor index 2
+botShadowColor index 15
+controlPv "$(PORT):clearTimestamp"
+onLabel "Clear Timestamp"
+offLabel "Clear Timestamp"
+labelType "literal"
+3d
+font "utopia-bold-r-12.0"
+objType "controls"
+controlBitPos 0
+endObjectProperties
+
