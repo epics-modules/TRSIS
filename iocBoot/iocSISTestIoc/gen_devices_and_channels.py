@@ -35,7 +35,7 @@ def main():
                 '# Initialize each device and its channels.')
         for device in devices:
             f.write(('\n\n# Device {name:}\n' +
-                     'SISInitDevice("{name:}","{vme_addr:}","{vme_int_vec:}","{vme_int_lev:}","$(READ_THREAD_PRIO)","$(READ_THREAD_STACK)","$(AD_MAX_BUFS)","$(AD_MAX_MEM)")\n\n').format(**device))
+                     'SISInitDevice("{name:}","{vme_addr:}","{vme_int_vec:}","{vme_int_lev:}","$(READ_THREAD_PRIO)","$(READ_THREAD_STACK)","$(AD_MAX_BUFS)","$(AD_MAX_MEM)","$(INTR_THREAD_PRIO)")\n\n').format(**device))
             for channel in device['channels']:
                 assert is_valid_channel(channel)
                 f.write('NDStdArraysConfigure("{name:}_{0:}",$(STDAR_QU_SZ),$(STDAR_BL_CB),"{name:}_channels",{0:},$(STDAR_MAX_MEM),$(STDARR_PRI),$(STDAR_ST_SZ))\n'.format(channel, **device))

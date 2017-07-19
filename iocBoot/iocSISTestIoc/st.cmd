@@ -14,6 +14,10 @@ epicsEnvSet("READ_THREAD_PRIO", "60")
 # Read thread stack size
 epicsEnvSet("READ_THREAD_STACK", "0")
 
+## Interrupt thread configuration
+# Interrupt thread priority (EPICS units)
+epicsEnvSet("INTR_THREAD_PRIO", "90")
+
 ## AreaDetector configuration
 # Max buffers for the channel port
 epicsEnvSet("AD_MAX_BUFS", "32")

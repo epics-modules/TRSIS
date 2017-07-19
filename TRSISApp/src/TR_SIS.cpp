@@ -131,9 +131,9 @@ struct SubmitCallback : public TRArrayCompletionCallback {
 // Functions of the main class
 
 TRSISDriver::TRSISDriver(char const *port_name,
-            uint32_t a32offset, int intVec, int intLev,
-            int read_thread_prio, int read_thread_stack_size,
-            int max_ad_buffers, size_t max_ad_memory)
+    uint32_t a32offset, int intVec, int intLev, int read_thread_prio,
+    int read_thread_stack_size, int max_ad_buffers, size_t max_ad_memory,
+    int interrupt_thread_prio_epics)
 :
     TRBaseDriver(TRBaseConfig()
         .set(&TRBaseConfig::port_name, std::string(port_name))
@@ -153,8 +153,14 @@ TRSISDriver::TRSISDriver(char const *port_name,
     m_pci_base_address(NULL),
     m_interrupt_level(intLev),
     m_interrupt_vector(intVec),
+    m_interrupt_thread_runnable(this),
+    m_interrupt_thread(m_interrupt_thread_runnable,
+        (std::string("SISint:") + port_name).c_str(),
+        epicsThreadGetStackSize(epicsThreadStackSmall),
+        interrupt_thread_prio_epics),
     m_opened(false),
     m_armed(false),
+    m_stop_interrupt(false),
     m_prev_hw_timestamp(0),
     m_event_group_id(0),
     m_interrupt_time_broken(false)
@@ -292,7 +298,7 @@ bool TRSISDriver::Open()
         m_dma_id = rtemsVmeDmaCreate(TRSISDriver::dmaInterruptHandlerTrampoline, this);
         if (m_dma_id == NULL || rtemsVmeDmaStatus(m_dma_id) == 0) {
             errlogSevPrintf(errlogMajor, "Open device: rtemsVmeDmaCreate failed.");
-            return false;
+            goto cleanup2;
         }
         
         // Update device info registers, set opened to true.
@@ -300,6 +306,9 @@ bool TRSISDriver::Open()
             epicsGuard<asynPortDriver> guard(*this);
             finalizeOpen(moduleRegValue);
         }
+        
+        // Start interrupt thread.
+        m_interrupt_thread.start();
     } while (false);
     
     return true;
@@ -628,6 +637,33 @@ uint32_t TRSISDriver::readRegister(uint32_t offset, bool from_interrupt)
 #endif
 
     return value;
+}
+
+void TRSISDriver::ioMemoryBarrier()
+{
+    // We need a compiler level memory barrier (memory clobber) as well
+    // as a CPU instruction which ensures that memory and I/O writes by
+    // the CPU are not reordered across this point with respect to each
+    // other. For PowerPC, the eieio instruction achieves this.
+    // Note that RTEMS has a macro for eieio but which is not sufficient
+    // because it does not have the memory clobber.
+#if defined(__GNUC__) && defined(__PPC__)
+    asm volatile ("eieio\n" : : : "memory");
+#else
+#error "ioMemoryBarrier not implemented for this compiler/CPU"
+#endif
+}
+
+void TRSISDriver::dmaMemoryBarrier()
+{
+    // Ensure ordering with respect to CPU and DMA memory accesses.
+    // A compiler level memory barrier is needed as well as a CPU instruction.
+    // For PowerPC, the sync instruction (but not eieio) is appropriate.
+#if defined(__GNUC__) && defined(__PPC__)
+    asm volatile ("sync\n" : : : "memory");
+#else
+#error "dmaMemoryBarrier not implemented for this compiler/CPU"
+#endif
 }
 
 bool TRSISDriver::checkSettings(TRArmInfo &arm_info)
@@ -1119,11 +1155,6 @@ bool TRSISDriver::startAcquisition(bool had_overflow)
         return false;
     }
     
-    // Before enabling interrupt sources, sleep a short time so that any interrupts
-    // that were pending from the previous arming are handled, so that we don't
-    // misinterpret such an interrupt.
-    epicsThreadSleep(0.001);
-    
     // Enable IRQ source 1 (end of last event in multi event mode).
     // Only the low 8 bits are configuration we care about here.
     if (!commitSetClearRegister(SIS3302_IRQ_CONTROL, IrqControlSourceEndLastEvent, IrqControlSourcesMask)) {
@@ -1143,7 +1174,6 @@ bool TRSISDriver::startAcquisition(bool had_overflow)
         errlogSevPrintf(errlogMajor, "startAcquisition: Sample buffer allocation failed.");
         goto cleanup;
     }
-    m_sample_buffer = &m_sample_vector[0];
     
     // Allocate the event info buffer
     if (!allocateVector(m_event_infos, eventsBufferSize())) {
@@ -1164,6 +1194,10 @@ bool TRSISDriver::startAcquisition(bool had_overflow)
     // if an interrupt arrives very soon. This also enables handling SW triggers
     // if applicable.
     setArmed(true);
+    
+    // Barrier to ensure that relevant memory writes complete before the device
+    // receives the arm request below.
+    ioMemoryBarrier();
     
     // Arm the sampling logic.
     // NOTE: We don't try to verify this by reading the Acquisition Control register
@@ -1207,11 +1241,25 @@ void TRSISDriver::stopAcquisition()
         errlogSevPrintf(errlogMajor, "stopAcquisition: Error setting interrupt control.");
     }
     
+    // Sleep a short time so that any interrupts that are pending in hardware
+    // are handled by interruptHandler.
+    epicsThreadSleep(0.001);
+    
+    // Synchronize with interruptThread. We want to ensure that handleSingleInterrupt
+    // does not run again past this point, to avoid problems if acquisition is restarted
+    // while handleSingleInterrupt is running.
+    synchronizeStopWithInterruptThread();
+    
     // Clear m_armed to ignore any further interrupts and SW triggers.
     // This is done before disarming the sampling logic to ensure that
     // the interrupt handler doesn't mistake the interrupt for a normal
     // end of an event group.
     setArmed(false);
+    
+    // Barrier to ensure that relevant memory writes complete before the device
+    // receives the disarm request below, so that any interrupt caused by disarming
+    // will surely see m_armed to be false.
+    ioMemoryBarrier();
     
     // Disarm the sampling logic.
     writeRegister(SIS3302_KEY_DISARM, 1);
@@ -1233,6 +1281,40 @@ void TRSISDriver::stopAcquisition()
     }
 }
 
+void TRSISDriver::synchronizeStopWithInterruptThread()
+{
+    // If we use only raw interrupts (currently not implemented),
+    // this synchronization is not needed.
+    if (interruptLockArg() == NULL) {
+        return;
+    }
+    
+    // m_stop_interrupt is only set to true here and is cleared by
+    // the time we're done, so it must be false when we get here.
+    assert(!m_stop_interrupt);
+    
+    // Lock to protect access to m_stop_interrupt.
+    epicsGuard<epicsMutex> lock(m_interrupt_mutex);
+    
+    // Issue a stop request to the interruptThread by setting the flag
+    // and signaling the event (to make sure the interruptThread finds
+    // the flag to be set).
+    m_stop_interrupt = true;
+    m_interrupt_handler_event.signal();
+    
+    // NOTE: It is important that we signal the event before unlocking the mutex
+    // because we rely on the interruptThread to clear the event as part of the
+    // stop request. If we signaled the event later that could be after the stop
+    // request was already handled and the goal of preventing additional
+    // handleSingleInterrupt calls would not be achieved.
+    
+    // Wait until the interrupt thread acknowledges the stop request.
+    do {
+        epicsGuardRelease<epicsMutex> unlock(lock);
+        m_interrupt_event.wait();
+    } while (m_stop_interrupt);
+}
+
 void TRSISDriver::onDisarmed()
 {
     // Make sure the desired clock source is applied to hardware, since if it
@@ -1246,7 +1328,7 @@ void TRSISDriver::setArmed(bool value)
 {
     // First port lock then interrupt lock!
     epicsGuard<asynPortDriver> guard(*this);
-    TR_SIS_InterruptLock lock;
+    TR_SIS_InterruptLock lock(interruptLockArg());
     m_armed = value;
 }
 
@@ -1262,12 +1344,69 @@ void TRSISDriver::dmaInterruptHandlerTrampoline(void *arg)
 
 void TRSISDriver::interruptHandler()
 {
+    // Just signal the event for interruptThread to pick up.
+    // We do not need any acknowledgement here because ROAK is used.
+    m_interrupt_handler_event.signal();
+}
+
+void TRSISDriver::interruptThread()
+{
+    while (true) {
+        // Wait for an interrupt.
+        m_interrupt_handler_event.wait();
+        
+        // Handle the interrupt.
+        handleSingleInterrupt(&m_interrupt_mutex);
+    }
+}
+
+void TRSISDriver::handleSingleInterrupt(epicsMutex *non_interrupt_mutex)
+{
+    // NOTE: This function is written to support being called both directly from
+    // interrupt context as well as from a thread. The argument non_interrupt_mutex
+    // tells us which is the case: if it is null we are in a real interrupt handler,
+    // otherwise we are in a thread and we use that mutex for locking.
+    
     // Disable and clear the interrupt.
     // This is important because if we didn't do it, it would remain
     // latched and another interrupt couldn't be generated.
     writeRegister(SIS3302_IRQ_CONTROL, IrqControlSourceEndLastEvent << 16, true);
     
-    if (!m_armed) {
+    // Read out some variables safely (ones that may be updated
+    // from the read thread), clear m_stop_interrupt at the same time.
+    bool stop_interrupt;
+    bool armed;
+    SampleRingPointer buffer_start_pointer;
+    EventRingPointer events_start;
+    {
+        TR_SIS_InterruptSideLock lock(non_interrupt_mutex);
+        stop_interrupt = m_stop_interrupt;
+        m_stop_interrupt = false;
+        armed = m_armed;
+        buffer_start_pointer = m_buffer_start_pointer;
+        events_start = m_events_start;
+    }
+    
+    if (stop_interrupt) {
+        // stopAcquisition (synchronizeStopWithInterruptThread) is trying to
+        // synchronize with the interrupt thread. We have already cleared
+        // m_stop_interrupt to acknowledge the request.
+        
+        // Clear m_interrupt_handler_event to prevent additional calls of
+        // handleSingleInterrupt until the next acquisition is started. Note that
+        // stopAcquisition already disabled interrupts in HW and slept a bit
+        // therefore there should be no spurious raw interruptHandler calls.
+        m_interrupt_handler_event.tryWait();
+        
+        // Signal the event to make sure stopAcquisition wakes up to find
+        // m_stop_interrupt being false.
+        m_interrupt_event.signal();
+        
+        // Don't need to do anything else since data is not being read anymore.
+        return;
+    }
+    
+    if (!armed) {
         // NOTE: This actually can occur if the interrupt was generated
         // shortly before we disabled interrupt sources in stopAcquisition.
         // But it's better to have the remote possibility of spurious messages
@@ -1292,11 +1431,10 @@ void TRSISDriver::interruptHandler()
     }
 #endif
     
-    // Read out some variables we need.
-    int events_size = eventsBufferSize();
+    // Read these variables which do not need to be protected since they
+    // are not updated from the read thread while acquisition is active.
     int eventsPerGroup = m_config_events_per_group.getSnapshotFast();
-    SampleRingPointer buffer_start_pointer = m_buffer_start_pointer;
-    EventRingPointer events_start = m_events_start;
+    int events_size = eventsBufferSize();
     EventRingPointer events_end = m_events_end;
     
 #if DEBUG_INTERRUPT
@@ -1397,20 +1535,30 @@ void TRSISDriver::interruptHandler()
     }
     
     // Consider rearming if this isn't the last requested burst
+    bool could_not_rearm = false;
     if (m_remaining_bursts != 0) {
         // If there isn't enough space in the sample buffer, the read thread
         // must rearm after processing some data
         if (!rearmIfSpaceAvailable(ring_space, eventsPerGroup, buffer_start_pointer,
                                    last_event_stop, true))
         {
+            could_not_rearm = true;
+        }
+    }
+    
+    // NOTE: There is no problem that we might have rearmed before updating
+    // variables below, since this function cannot run again before it returns.
+    
+    // Update variables, under a lock because other threads read them.
+    {
+        TR_SIS_InterruptSideLock lock(non_interrupt_mutex);
+        m_events_end = events_end;
+        if (could_not_rearm) {
             m_need_rearm = true;
             m_delayed_rearms_count = (m_delayed_rearms_count == INT_MAX) ? 0 :
                 m_delayed_rearms_count + 1;
         }
     }
-
-    // Write back the updated events end pointer.
-    m_events_end = events_end;
     
     // Signal the event to let the readBurst wait for events.
     m_interrupt_event.signal();
@@ -1482,9 +1630,16 @@ bool TRSISDriver::rearmIfSpaceAvailable(
         m_need_rearm = false;
     }
     
-    // Enable the interrupt, set sample start address, rearm.
+    // Enable the interrupt, set sample start address.
     writeRegister(SIS3302_IRQ_CONTROL, IrqControlSourceEndLastEvent, from_interrupt);
     writeRegister(SIS3302_SAMPLE_START_ADDRESS_ALL_ADC, buffer_end_pointer, from_interrupt);
+    
+    // Barrier to ensure that relevant memory writes complete before the device
+    // receives the arm request below, so that another interrupt handler will
+    // surely see updated variables.
+    ioMemoryBarrier();
+    
+    // Rearm.
     writeRegister(SIS3302_KEY_ARM, 1, from_interrupt);
     
     return true;
@@ -1622,7 +1777,7 @@ bool TRSISDriver::readBurst()
         }
 
         // Read the channel data into a local buffer
-        if (!doDmaForChannel(channel, m_buffer_start_pointer, m_sample_buffer,
+        if (!doDmaForChannel(channel, m_buffer_start_pointer, m_sample_vector.data(),
                     m_event_or_page_length * eventsPerGroup)) {
             // Error messages printed in underlying functions
             return false;
@@ -1646,7 +1801,7 @@ bool TRSISDriver::readBurst()
             // and we need to copy them separately because that may be greater
             // than numPPS (due to being rounded up to 4 samples).
             for (int event = 0; event < eventsPerGroup; ++event) {
-                copySamplesToFloats(&m_sample_buffer[event * m_event_or_page_length],
+                copySamplesToFloats(&m_sample_vector[event * m_event_or_page_length],
                                     outData, numPPS);
                 outData += numPPS;
             }
@@ -1663,7 +1818,7 @@ bool TRSISDriver::readBurst()
                 if (eventInfo.stop_pointer >= numPPS) {
                     // All of the samples are present in the page and in the correct order
                     copySamplesToFloats(
-                        &m_sample_buffer[inputPageStart + eventInfo.stop_pointer - numPPS],
+                        &m_sample_vector[inputPageStart + eventInfo.stop_pointer - numPPS],
                         outData, numPPS);
                 } else {
                     // How many of the numPPS samples are at the end of the page before wrapping.
@@ -1672,7 +1827,7 @@ bool TRSISDriver::readBurst()
                     // We have wrapped or truncation has occured.
                     if (eventInfo.has_wrapped) {
                         copySamplesToFloats(
-                            &m_sample_buffer[inputPageStart + m_event_or_page_length - preWrapSamples],
+                            &m_sample_vector[inputPageStart + m_event_or_page_length - preWrapSamples],
                             outData, preWrapSamples);
                     } else {
                         // Set the first preWrapSamples of the output array to NaN
@@ -1681,7 +1836,7 @@ bool TRSISDriver::readBurst()
                     
                     // Copy the remaining samples from the beginning of the page
                     copySamplesToFloats(
-                        &m_sample_buffer[inputPageStart],
+                        &m_sample_vector[inputPageStart],
                         outData + preWrapSamples, eventInfo.stop_pointer);
                 }
 
@@ -1712,7 +1867,7 @@ bool TRSISDriver::readBurst()
     int delayed_rearms_count;
     EventRingPointer events_end;
     {
-        TR_SIS_InterruptLock lock;
+        TR_SIS_InterruptLock lock(interruptLockArg());
         m_events_start = events_start;
         m_buffer_start_pointer = buffer_start_pointer;
         need_rearm = m_need_rearm;
@@ -1789,7 +1944,7 @@ bool TRSISDriver::waitForEvents(EventRingPointer events_start)
         
         // Read the events end pointer safely.
         {
-            TR_SIS_InterruptLock lock;
+            TR_SIS_InterruptLock lock(interruptLockArg());
             events_end = m_events_end;
         }
         assert(events_end.isValid(eventsBufferSize()));
@@ -1868,7 +2023,15 @@ bool TRSISDriver::doDmaForChannelAndPage(int channel, int pageNumber,
             return false;
         }
     }
+    
+    // Barrier to ensure any CPU accesses to buffer have been done before DMA
+    // could start writing.
+    dmaMemoryBarrier();
 
+    // Note: no barrier is needed to ensure the page number is updated when
+    // the DMA transfer starts, since setting the page number and starting DMA
+    // are both volatile accesses to non-cached (I/O) regions.
+    
     // Begin DMA transfer
     uint32_t vmeStartAddress = m_vme_a32_base_address + getChannelVmeOffset(channel) +
         2 * offsetInPage;
@@ -1893,6 +2056,9 @@ bool TRSISDriver::doDmaForChannelAndPage(int channel, int pageNumber,
                 channel, dmaStatus);
         return false;
     }
+    
+    // Barrier to ensure we see the new data in the buffer.
+    dmaMemoryBarrier();
 
     return true;
 }
@@ -1985,16 +2151,22 @@ uint32_t TRSISDriver::getNextPageStart(uint32_t bufferPointer, uint32_t pageSize
     return (bufferPointer & page_mask) + pageSize;
 }
 
+static bool prioIsValid(int prio)
+{
+    return prio >= epicsThreadPriorityMin && prio <= epicsThreadPriorityMax;
+}
+
 // Register the driver with epics
 extern "C"
 int TRSISConfigure(char const *port_name,
-            uint32_t a32offset, int intVec, int intLev,
-            int read_thread_prio_epics, int read_thread_stack_size,
-            int max_ad_buffers, size_t max_ad_memory)
+    uint32_t a32offset, int intVec, int intLev, int read_thread_prio_epics,
+    int read_thread_stack_size, int max_ad_buffers, size_t max_ad_memory,
+    int interrupt_thread_prio_epics)
 {
     // Basic error checking
-    if (port_name == NULL || read_thread_prio_epics < epicsThreadPriorityMin ||
-            read_thread_prio_epics > epicsThreadPriorityMax) { 
+    if (port_name == NULL || !prioIsValid(read_thread_prio_epics) ||
+        !prioIsValid(interrupt_thread_prio_epics))
+    { 
         fprintf(stderr, "SISInitDevice Error: parameters are not valid.\n");
         return 1;
     }
@@ -2011,7 +2183,7 @@ int TRSISConfigure(char const *port_name,
     TRSISDriver *driver = new TRSISDriver(port_name,
             a32offset, intVec, intLev,
             read_thread_prio_epics, read_thread_stack_size,
-            max_ad_buffers, max_ad_memory);
+            max_ad_buffers, max_ad_memory, interrupt_thread_prio_epics);
     
     driver->completeInit();
 
@@ -2032,14 +2204,15 @@ static const iocshArg initArg4 = {"read thread priority (EPICS units)", iocshArg
 static const iocshArg initArg5 = {"read thread stack size", iocshArgInt};
 static const iocshArg initArg6 = {"max AreaDetector buffers", iocshArgInt};
 static const iocshArg initArg7 = {"max AreaDetector memory", iocshArgInt};
+static const iocshArg initArg8 = {"interrupt thread priority (EPICS units)", iocshArgInt};
 static const iocshArg * const initArgs[] = {&initArg0, &initArg1, &initArg2,
-            &initArg3, &initArg4, &initArg5, &initArg6, &initArg7};
-static const iocshFuncDef initFuncDef = {"SISInitDevice", 8, initArgs};
+            &initArg3, &initArg4, &initArg5, &initArg6, &initArg7, &initArg8};
+static const iocshFuncDef initFuncDef = {"SISInitDevice", 9, initArgs};
 
 static void initCallFunc(const iocshArgBuf *args)
 {
     TRSISConfigure(args[0].sval, args[1].ival, args[2].ival, args[3].ival,
-            args[4].ival, args[5].ival, args[6].ival, args[7].ival);
+            args[4].ival, args[5].ival, args[6].ival, args[7].ival, args[8].ival);
 }
 
 extern "C" {

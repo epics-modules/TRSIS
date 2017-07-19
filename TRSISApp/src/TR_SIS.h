@@ -18,6 +18,7 @@
 #include <epicsEvent.h>
 #include <epicsTime.h>
 #include <epicsAssert.h>
+#include <epicsThread.h>
 
 #include <TRBaseDriver.h>
 
@@ -29,11 +30,18 @@ class TRSISDriver : public TRBaseDriver
 {
 public:
     TRSISDriver(char const *port_name,
-            uint32_t a32offset, int intVec, int intLev,
-            int read_thread_prio, int read_thread_stack_size,
-            int max_ad_buffers, size_t max_ad_memory);
+        uint32_t a32offset, int intVec, int intLev, int read_thread_prio,
+        int read_thread_stack_size, int max_ad_buffers, size_t max_ad_memory,
+        int interrupt_thread_prio_epics);
 
-private:
+    // NOTE: For the sake of principle, there is nothing private in this class and
+    // most functions are virtual. But this class was not designed to be extended
+    // like that. Support for similar devices might be easiest to implement by
+    // directly modifying this class and possibly by splitting into a base class
+    // and device-specific derived classes based on the similarities and differences
+    // of devices.
+    
+protected:
     // Constants (only those we need in the header)
     static const int MaxChannelNum = 8;
     static const uint32_t FullBitMask = 0xffffffff;
@@ -61,6 +69,23 @@ private:
         uint32_t stop_pointer;
         bool has_wrapped;
         int discarded_samples;
+    };
+    
+    // epicsThreadRunable helper for the interrupt thread
+    class InterruptThreadRunnable : public epicsThreadRunable
+    {
+    public:
+        inline InterruptThreadRunnable(TRSISDriver *parent) :
+            m_parent(parent)
+        {}
+        
+    private:
+        TRSISDriver *m_parent;
+        
+        void run () // override
+        {
+            m_parent->interruptThread();
+        }
     };
 
     // ENUMS
@@ -196,14 +221,37 @@ private:
     
     // End of acquisition settings
 
-    // Synchronization events
+    // Thread which handles interrupts with runnable helper.
+    InterruptThreadRunnable m_interrupt_thread_runnable;
+    epicsThread m_interrupt_thread;
+    
+    // Mutex used for protecting certain data that is accessed both by the interrupt
+    // thread and other threads such as the read thread.
+    epicsMutex m_interrupt_mutex;
+    
+    // Synchronization events:
+    
+    // This event is signaled in the interruptHandler, and waited on in the
+    // interruptThread which proceeds to call handleSingleInterrupt.
+    epicsEvent m_interrupt_handler_event;
+    
+    // This event is signaled in handleSingleInterrupt after event information
+    // has been stored and the device was possibly rearmed, and is waited on in
+    // the read thread to wait for events (waitForEvents). Additionally it is
+    // signaled when disarming was requested (interruptReading). Finally it is
+    // also used for acknowledging a stop synchronization request
+    // (synchronizeStopWithInterruptThread).
     epicsEvent m_interrupt_event;
+    
+    // This event is signaled in dmaInterruptHandler when a DMA transfer is
+    // complete and is waited on in doDmaForChannelAndPage.
     epicsEvent m_dma_event;
     
     // Synchronization flags
     bool m_opened;
     bool m_armed;
     bool m_disarm;
+    bool m_stop_interrupt;
     
     // Read thread <-> interrupt handler synchronization:
     // whether digitizer needs to be rearmed from read thread
@@ -238,9 +286,6 @@ private:
     // beginning of each channel's processing.
     std::vector<uint16_t> m_sample_vector; 
     
-    // Convenience pointer to beginning of above vector's data area.
-    uint16_t *m_sample_buffer;
-    
     // The index of the last sample buffer element + 1 that has been populated
     // through DMA. Necessary to keep track of during multi-page transfers.
     int m_sample_buffer_pos;
@@ -267,7 +312,7 @@ public:
     // Called after port creation to open the device.
     bool Open();
 
-private:
+protected:
     // Small inline functions
     
     inline static bool isChannelNumber(int channel)
@@ -279,68 +324,87 @@ private:
     {
         return m_config_events_buffer_size.getSnapshotFast();
     }
+    
+    // Mutex pointer passed to TR_SIS_InterruptLock constructor for locking
+    // data that is also accessed by handleSingleInterrupt. If we ever support
+    // configuable interrupt handling mode (raw or thread), this could make
+    // a decision to return null or &m_interrupt_mutex respectively.
+    inline epicsMutex * interruptLockArg()
+    {
+        return &m_interrupt_mutex;
+    }
 
     // Called after the device is opened, updates device info and sets m_opened.
-    void finalizeOpen(uint32_t moduleRegValue);
+    virtual void finalizeOpen(uint32_t moduleRegValue);
     
     // Register access functions
     void writeRegister(uint32_t offset, uint32_t value, bool from_interrupt = false);
     uint32_t readRegister(uint32_t offset, bool from_interrupt = false);
+    
+    // A memory barrier which ensures ordering between memory stores and I/O stores.
+    static void ioMemoryBarrier();
+    
+    // A memory barrier which ensures synchronization between CPU memory accesses
+    // and DMA accesses.
+    static void dmaMemoryBarrier();
 
     // Asyn parameter access handlers
-    asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value); // override
-    asynStatus readInt32(asynUser *pasynUser, epicsInt32 *value); // override
+    virtual asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value); // override
+    virtual asynStatus readInt32(asynUser *pasynUser, epicsInt32 *value); // override
 
     // Handlers for requests via asyn parameter writes.
-    asynStatus handleSendSoftwareTrigger();
-    asynStatus updateActualValues();
-    asynStatus updateStates();
-    asynStatus handleReset();
-    asynStatus handleClearTimestamp();
-    asynStatus handleSetChannelDac(int channel, int value);
+    virtual asynStatus handleSendSoftwareTrigger();
+    virtual asynStatus updateActualValues();
+    virtual asynStatus updateStates();
+    virtual asynStatus handleReset();
+    virtual asynStatus handleClearTimestamp();
+    virtual asynStatus handleSetChannelDac(int channel, int value);
     
     // Reset digitizer with verification.
-    bool resetAndVerify();
+    virtual bool resetAndVerify();
     
     // Set channel DAC value.
-    bool setChannelDac(int channel, uint16_t value);
+    virtual bool setChannelDac(int channel, uint16_t value);
 
     // Set a clock source to the desired-parameter value, used to ensure the
     // clock source is set to the desired value while disarmed since it affects
     // actual value readbacks.
-    bool setDesiredClockSource();
+    virtual bool setDesiredClockSource();
     
     // This is called before startAcquisition, it checks settings and comptes
     // many variables used later. The remaining three functions do specific
     // parts of this.
-    bool checkSettings(TRArmInfo &arm_info); // override
-    bool checkClockAndAveragingSettings(TRArmInfo &arm_info);
-    bool checkEventConfiguration(TRArmInfo &arm_info);
-    bool checkTestDataConfiguration();
+    virtual bool checkSettings(TRArmInfo &arm_info); // override
+    virtual bool checkClockAndAveragingSettings(TRArmInfo &arm_info);
+    virtual bool checkEventConfiguration(TRArmInfo &arm_info);
+    virtual bool checkTestDataConfiguration();
 
     // Finds the best page large enough to contain the specified eventLength.
     // Sets m_page_code and m_event_or_page_length.
-    bool findPageLength(uint32_t eventLength);
+    virtual bool findPageLength(uint32_t eventLength);
 
     // Prepare hardware for reading data.
-    bool startAcquisition(bool had_overflow); // override
+    virtual bool startAcquisition(bool had_overflow); // override
 
     // Release memory in the three vectors used for data processing.
-    bool releaseAllVectors();
+    virtual bool releaseAllVectors();
 
     // Called when disarming is requested after startAcquisition was successful
     // to make sure readBurst returns soon.
-    void interruptReading (); // override
+    virtual void interruptReading (); // override
     
     // Disarm hardware (reverse of startAcquisition).
-    void stopAcquisition(); // override
+    virtual void stopAcquisition(); // override
+    
+    // Synchronize stop of acqisition with the interrupt thread.
+    virtual void synchronizeStopWithInterruptThread();
     
     // Called when the digitizer is considered no longer armed, used
     // to apply a possible desired clock source change.
-    void onDisarmed (); // override
+    virtual void onDisarmed (); // override
     
     // Set m_armed under port lock and interrupt lock.
-    void setArmed(bool value);
+    virtual void setArmed(bool value);
 
     // Interrupt handler static functions, just call correspondingly named
     // non-static functions.
@@ -351,10 +415,16 @@ private:
     void interruptHandler();
     void dmaInterruptHandler();
     
+    // The interrupt handling thread.
+    virtual void interruptThread();
+    
+    // Handle a single interrupt.
+    virtual void handleSingleInterrupt(epicsMutex *non_interrupt_mutex);
+    
     // Rearm if there is space available in the events buffer and sample buffer.
-    bool rearmIfSpaceAvailable(int ring_space, int eventsPerGroup,
-                               SampleRingPointer buffer_start_pointer,
-                               uint32_t last_event_stop, bool from_interrupt);
+    virtual bool rearmIfSpaceAvailable(
+        int ring_space, int eventsPerGroup, SampleRingPointer buffer_start_pointer,
+        uint32_t last_event_stop, bool from_interrupt);
     
     // Register commit helper functions
     
@@ -367,27 +437,28 @@ private:
     // several other registers. This is also used to wait for DAC commands.
     // Since the hardware typically responds quickly, on the order of microseconds,
     // we do not issue any sleep commands between retries.
-    bool verifyRegister(uint32_t offset, uint32_t desiredReadbackValue,
-            uint32_t readbackComparisonMask = FullBitMask, int maxRetries = 20);
+    virtual bool verifyRegister(uint32_t offset, uint32_t desiredReadbackValue,
+        uint32_t readbackComparisonMask = FullBitMask, int maxRetries = 20);
 
     // Writes then verifies a register.
-    bool commitRegister(uint32_t offset, uint32_t commitValue, uint32_t desiredReadbackValue,
-            uint32_t readbackComparisonMask = FullBitMask, int maxRetries = 20);
+    virtual bool commitRegister(uint32_t offset, uint32_t commitValue,
+        uint32_t desiredReadbackValue, uint32_t readbackComparisonMask = FullBitMask,
+        int maxRetries = 20);
 
     // Convenience function for configuring a common type of register in which
     // the lower 16 bits set specific bits and the upper bits clear those bits.
     // Since in some cases only a subset of the bits work like that, we support
     // a mask which specifies the bits that we want to configure (the mask should
     // have low bits only).
-    bool commitSetClearRegister(uint32_t offset, uint32_t value, uint32_t mask);
+    virtual bool commitSetClearRegister(uint32_t offset, uint32_t value, uint32_t mask);
     
     // Data reading and related helper functions
     
     // Wait for and read a burst of data.
-    bool readBurst(); // override
+    virtual bool readBurst(); // override
 
     // Wait for some events to be ready.
-    bool waitForEvents(EventRingPointer events_start);
+    virtual bool waitForEvents(EventRingPointer events_start);
     
     // Check if interrupt time is broken and possibly warn.
     bool interruptTimeBroken(const epicsTimeStamp &timeStamp);
@@ -397,22 +468,25 @@ private:
     
     // Transfer lengthInSamples samples from offset srcSampleAddress in the
     // digitizer's buffer to the local buffer dest, using VME DMA.
-    bool doDmaForChannel(int channel, uint32_t srcSampleAddress, uint16_t *dest, uint32_t lengthInSamples);
+    virtual bool doDmaForChannel(int channel, uint32_t srcSampleAddress,
+                                 uint16_t *dest, uint32_t lengthInSamples);
 
     // Perform a single DMA transfer, for a single channel and ADC page.
-    bool doDmaForChannelAndPage(int channelNumber, int pageNumber, uint32_t offsetInPage,
-            uint16_t *dest, uint32_t lengthInSamples);
+    virtual bool doDmaForChannelAndPage(int channelNumber, int pageNumber,
+        uint32_t offsetInPage, uint16_t *dest, uint32_t lengthInSamples);
 
     // Calculate metadata about an event in form of a ProcdEventInfo structure.
-    ProcdEventInfo calculateEventAlignment(const EventInfo &eventInfo, bool softTrigger);
+    virtual ProcdEventInfo calculateEventAlignment(
+        const EventInfo &eventInfo, bool softTrigger);
 
     // Publish information about event group, called at the end of readBurst.
-    void publishMetaInfo(const epicsTimeStamp &readBurstStartTimeTs, double interruptTime,
-                         uint64_t hw_timestamp, uint64_t rel_hw_time, int delayed_rearms_count);
+    virtual void publishMetaInfo(
+        const epicsTimeStamp &readBurstStartTimeTs, double interruptTime,
+        uint64_t hw_timestamp, uint64_t rel_hw_time, int delayed_rearms_count);
     
     // This was meant to process data previously read in readBurst but since
     // we also process data there to improve memory effficiency, it does nothing.
-    bool processBurstData(); // override
+    virtual bool processBurstData(); // override
 
     // NOTE: We don't override requestedSampleRateChanged because the clock selection
     // mechanism offered by TRBaseDriver is of no use to us, the hardware only

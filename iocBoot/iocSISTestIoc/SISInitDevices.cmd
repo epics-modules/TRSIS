@@ -2,7 +2,7 @@
 # Initialize each device and its channels.
 
 # Device SIS3302
-SISInitDevice("SIS3302","0x20000000","125","1","$(READ_THREAD_PRIO)","$(READ_THREAD_STACK)","$(AD_MAX_BUFS)","$(AD_MAX_MEM)")
+SISInitDevice("SIS3302","0x20000000","125","1","$(READ_THREAD_PRIO)","$(READ_THREAD_STACK)","$(AD_MAX_BUFS)","$(AD_MAX_MEM)","$(INTR_THREAD_PRIO)")
 
 NDStdArraysConfigure("SIS3302_0",$(STDAR_QU_SZ),$(STDAR_BL_CB),"SIS3302_channels",0,$(STDAR_MAX_MEM),$(STDARR_PRI),$(STDAR_ST_SZ))
 NDStdArraysConfigure("SIS3302_1",$(STDAR_QU_SZ),$(STDAR_BL_CB),"SIS3302_channels",1,$(STDAR_MAX_MEM),$(STDARR_PRI),$(STDAR_ST_SZ))
