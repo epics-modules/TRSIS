@@ -19,6 +19,10 @@
 #include <algorithm>
 #include <new>
 
+#ifdef __rtems__
+#include <libcpu/io.h>
+#endif
+
 #include <epicsExport.h>
 #include <epicsGuard.h>
 #include <epicsThread.h>
@@ -167,6 +171,12 @@ TRSISDriver::TRSISDriver(char const *port_name,
 {
     char param_name[64];
     
+    if (interrupt_thread_prio_epics <= read_thread_prio) {
+        errlogSevPrintf(errlogMajor, "WARNING: Interrupt thread priority (%d) "
+            "is not greater than read thead priority (%d).",
+            interrupt_thread_prio_epics, read_thread_prio);
+    }
+    
     // Configuration params.
     // The invalid-values of parameters with a discrete set of possible values
     // are set to -1, which represents a "not-available" value. EPICS records
@@ -296,7 +306,7 @@ bool TRSISDriver::Open()
 
         // Initialize DMA handle, associate interrupt handler
         m_dma_id = rtemsVmeDmaCreate(TRSISDriver::dmaInterruptHandlerTrampoline, this);
-        if (m_dma_id == NULL || rtemsVmeDmaStatus(m_dma_id) == 0) {
+        if (m_dma_id == NULL) {
             errlogSevPrintf(errlogMajor, "Open device: rtemsVmeDmaCreate failed.");
             goto cleanup2;
         }
@@ -607,8 +617,14 @@ void TRSISDriver::writeRegister(uint32_t offset, uint32_t value, bool from_inter
     }
 #endif
 
-    volatile uint32_t *reg = (volatile uint32_t *)(m_pci_base_address + offset);
-    *reg = value;
+    volatile char *addr = m_pci_base_address + offset;
+
+#ifdef __rtems__
+    out_be32((volatile unsigned *)addr, (int)value);
+#else
+#error "writeRegister not implemented for this platform"
+    *((volatile uint32_t *)addr) = value;
+#endif
     
 #if SIS_DEBUG
     if (!from_interrupt) {
@@ -627,8 +643,15 @@ uint32_t TRSISDriver::readRegister(uint32_t offset, bool from_interrupt)
     }
 #endif
 
-    volatile uint32_t *reg = (volatile uint32_t *)(m_pci_base_address + offset);
-    uint32_t value = *reg;
+    volatile char *addr = m_pci_base_address + offset;
+    uint32_t value;
+    
+#ifdef __rtems__
+    value = (uint32_t)in_be32((volatile unsigned *)addr);
+#else
+#error "readRegister not implemented for this platform"
+    value = *((volatile uint32_t *)addr);
+#endif
     
 #if SIS_DEBUG
     if (!from_interrupt) {
